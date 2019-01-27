@@ -1,4 +1,4 @@
 # github-open-academy.github.io
 Curated video lessons for free.
 
-For instructions, please go to https://github.com/github-open-academy/fork-me
+For instructions regarding creating your own entry, please go to https://github.com/github-open-academy/fork-me .
