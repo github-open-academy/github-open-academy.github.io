@@ -56,7 +56,7 @@
         this.setState({
           courses: []
         })
-        axios.get('https://api.github.com/repos/github-open-academy/fork-me/forks?sort=stargazers&access_token=273852bce6f03812c0a064ab8cef00bace2b1814')
+        axios.get('https://api.github.com/repos/github-open-academy/fork-me/forks?sort=stargazers')
         .then((response) => {
           console.log(response)
           this.setState({
