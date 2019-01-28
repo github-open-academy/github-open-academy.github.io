@@ -228,50 +228,48 @@
       constructor(props){
         super();
 
-        let readmeResponse = '### Needs update...';
-        let playlist: [];
-
         this.setState({
-          readmeResponse,
+          readme: '# No Readme',
           playlist: []
         })
 
         this.props = props;
-        
-        axios.get(`https://raw.githubusercontent.com/${props.user}/${props.name}/master/README.md`)
-        .then((response) => {
-          
-          readmeResponse = markdownit().render(response.data)
-          
-        }).catch(function(ex) {
-          console.log('parsing failed', ex)
-        }).then(()=>{
-          axios.get(`https://raw.githubusercontent.com/${props.user}/${props.name}/master/playlist.json`)
-          .then((response) => {
-            this.setState({
-              playlist: response.data,
-              readmeResponse
-            });
-          }).catch(function(ex) {
-            console.log('parsing failed', ex)
-          });
 
-        })
+        this.props.initialRender = true;
+
+        this.getData().then(data => this.setState(data));
+      }
+
+      async getData(){
+        const readme = (await axios.get(`https://raw.githubusercontent.com/${this.props.user}/${this.props.name}/master/README.md`)).data;
+        const playlist = (await axios.get(`https://raw.githubusercontent.com/${this.props.user}/${this.props.name}/master/playlist.json`)).data
+        
+        return {
+          readme,
+          playlist
+        }
+      }
+
+      componentWillReceiveProps(nextProps){
+        if(this.props.name != nextProps.name || this.props.initialRender){
+          this.props = nextProps;
+          this.props.initialRender = false;
+          this.getData().then(data => this.setState(data));
+        }
       }
 
       render() {
         const contentType = typeof(this.props.content) === 'undefined' ? 'md' : 'video';
-        const value = contentType === 'md' ? this.state.readmeResponse : this.props.content;
+        const value = contentType === 'md' ? markdownit().render(this.state.readme) : this.props.content;
         return (
-        
-        <div class="row mt-3">
-          <div class="col-lg-4 col-sm-12">
-            <Playlist details={this.props} playlist={this.state.playlist}/>
+          <div class="row mt-3">
+            <div class="col-lg-4 col-sm-12">
+              <Playlist details={this.props} playlist={this.state.playlist}/>
+            </div>
+            <div class="col-lg-8 col-sm-12">
+              <Content type={contentType} value={value} />
+            </div>
           </div>
-          <div class="col-lg-8 col-sm-12">
-            <Content type={contentType} value={value} />
-          </div>
-        </div>
         )
       }
     }
